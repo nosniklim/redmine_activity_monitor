@@ -16,7 +16,7 @@ var myActivityChart = new Chart(ctx, {
           new_issue_counts    = RedmineActivityMonitor.new_issue_count(@project.id, targets)
           closed_issue_counts = RedmineActivityMonitor.closed_issue_count(@project.id, targets)
           max_value, step = RedmineActivityMonitor.get_processed_max_value(new_issue_counts.max, closed_issue_counts.max)
-new_issue_counts.max > closed_issue_counts.max ? new_issue_counts.max : closed_issue_counts.max
+          new_issue_counts.max > closed_issue_counts.max ? new_issue_counts.max : closed_issue_counts.max
         %>
         labels: [<%= targets %>],
         datasets: [{
