@@ -1,0 +1,76 @@
+<div class="box">
+<h3 style="float:left;"><%= l(:redmine_activity_monitor_name) %></h3>
+  <div style="overflow-y:scroll; clear: both;">
+  <canvas id="myActivityChart"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+  </div>
+</div>
+
+<script>
+var ctx = document.getElementById("myActivityChart");
+var myActivityChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        <%
+          targets = RedmineActivityMonitor.target_label.html_safe
+          new_issue_counts    = RedmineActivityMonitor.new_issue_count(@project.id, targets)
+          closed_issue_counts = RedmineActivityMonitor.closed_issue_count(@project.id, targets)
+          max_value, step = RedmineActivityMonitor.get_processed_max_value(new_issue_counts.max, closed_issue_counts.max)
+new_issue_counts.max > closed_issue_counts.max ? new_issue_counts.max : closed_issue_counts.max
+        %>
+        labels: [<%= targets %>],
+        datasets: [{
+            //Bar Graph
+            label: "New Issue",
+            data: [<%= new_issue_counts.join(',') %>],
+            backgroundColor: "rgba(219,39,91,0.5)", 
+            yAxisID: 'left-y-axis'
+        }, {
+            //Line Graph
+            label: "Closed Issue",
+            type: 'line',
+            data: [<%= closed_issue_counts.join(',') %>],
+            borderColor: "rgba(30,144,255,0.6)",
+            backgroundColor: "rgba(0,0,0,0)",
+            yAxisID: 'right-y-axis'
+        }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Activity Tendency'
+      },
+      scales: {
+            yAxes: [
+                {
+                  id: 'left-y-axis',
+                  position: 'left',
+                  ticks: {
+                    suggestedMax: <%= max_value %>,
+                    suggestedMin: 0,
+                    stepSize: <%= step %>,
+                    callback: function(value, index, values){
+                      return  value
+                    }
+                  }
+              }, {
+                  id: 'right-y-axis',
+                  position: 'right',
+                  ticks: {
+                    suggestedMax: <%= max_value %>,
+                    suggestedMin: 0,
+                    stepSize: <%= step %>,
+                    callback: function(value, index, values){
+                      return  value
+                    }
+                  },
+                  // remove gridline
+                  gridLines: {
+                    drawOnChartArea: false, 
+                  },
+              }
+           ]
+        }
+     }
+  });
+</script>
